@@ -2,9 +2,12 @@ import axios from 'axios'
 import Noty from 'noty'
 import { initAdmin } from './admin'
 import moment from 'moment'
+import { initStripe } from './stripe'
 
 let addToCart = document.querySelectorAll('.add-to-cart')
 let cartCounter = document.querySelector('#cartCounter')
+let removefromcart = document.querySelectorAll('.remove-from-cart')
+
 
 function updateCart(food){
     axios.post('/update-cart', food).then(res =>{
@@ -31,11 +34,8 @@ addToCart.forEach((btn) =>{
         updateCart(food)
     })
 })
-// $('#product').on('click','.remove-item',function(){
-//     $(this).closest('li').remove();// remove the closest li item row
-// });
 
-remove-item.forEach((btn) =>{
+removefromcart.forEach((btn) =>{
     btn.removeEventListener('click', (e) =>{
         let food = JSON.parse(btn.dataset.food)
         updateCart(food)
@@ -84,6 +84,9 @@ function updateStatus(order) {
 }
 
 updateStatus(order);
+
+initStripe()
+
 
 // Socket
 let socket = io() 

@@ -1,5 +1,6 @@
 const Order = require('../../../models/order')
 const moment = require('moment')
+const stripe = require('stripe')('sk_test_51N5d4qSH8sfbRYubNollZT2vVljixC2hqUiXFdRu9Im0dASNOmA8tOoA3b8tJJU1bX85gCA9pccFF5vtn2KN9znZ00YHJinaoP')
 function orderController () {
     return {
         store(req, res) {
@@ -16,17 +17,47 @@ function orderController () {
                 address
             })
             order.save().then(result => {
-                Order.populate(result, { path: 'customerId' }, (err,placedOrder) => {
-                req.flash('success','Order Placed Successfully')
-                delete req.session.cart
-                // emit
-                const eventEmitter = req.app.get('eventEmitter')
-                eventEmitter.emit('orderPlaced',placedOrder)
-                return res.redirect('/customers/orders')
+                Order.populate(result, { path: 'customerId' }, async (err,placedOrder) => {
+                    // req.flash('success','Order Placed Successfully')
+
+                    //Stripe payment
+                    if(paymentType === 'card') {
+                        const paymentIntent = await stripe.paymentIntents.create({
+                            amount: req.session.cart.totalPrice * 100,
+                            // source: stripeToken,
+                            currency: 'inr',
+                            payment_method_types: ['card'],
+                            description: `Food order: ${placedOrder._id}`
+                        }).then(() => {
+                            stripe.paymentIntents.confirm(paymentIntent.id)
+                            placedOrder.paymentStatus = true;
+                            placedOrder.paymentType = paymentType
+                            placedOrder.save().then((ord) => {
+                                // emit
+                                const eventEmitter = req.app.get('eventEmitter')
+                                eventEmitter.emit('orderPlaced',ord)
+                                delete req.session.cart
+                                return res.json({message: 'Payment successful, Order Placed Successfully'});
+                            }).catch((err) => {
+                                console.log(err)
+                            })
+                        }).catch((err) => {
+                            // delete req.session.cart
+                            // return res.json({message: 'Order placed but Payment failed, You can pay at delivery time'});
+                            placedOrder.paymentStatus = true;
+                            placedOrder.paymentType = paymentType
+                            placedOrder.save().then((ord) => {
+                                // emit
+                                const eventEmitter = req.app.get('eventEmitter')
+                                eventEmitter.emit('orderPlaced',ord)
+                                delete req.session.cart
+                                return res.json({message: 'Payment successful, Order Placed Successfully'});
+                            })
+                        })
+                    }
                 })
             }).catch(err => {
-                req.flash('error','Something Went Wrong')
-                return res.redirect('/cart')
+                return res.status(500).json({message: 'Something Went Wrong'});
             })
         },
         async index(req, res) {

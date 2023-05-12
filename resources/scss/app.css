@@ -1,106 +1,4 @@
-5412877777777777777777777777777777777777777777777777777777777777777777777777777777777777\
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-1
-441514445222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222
-11425555555555555541527body {
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  5
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  5
+body {
   font-family: 'Lato', sans-serif;
   -webkit-font-smoothing: antialiased;
   color: #232323;
@@ -145,6 +43,19 @@ nav li a:hover {
 }
 
 .add-to-cart:hover {
+  background: #fe5f1e;
+  border-color: #fff;
+  color: #fff;
+}
+
+.remove-from-cart {
+  border: 2px solid #fe5f1e;
+  color: #fe5f1e;
+  -webkit-transition: all 0.3s ease-in-out;
+  transition: all 0.3s ease-in-out;
+}
+
+.remove-from-cart:hover {
   background: #fe5f1e;
   border-color: #fff;
   color: #fff;
